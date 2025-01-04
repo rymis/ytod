@@ -90,7 +90,7 @@ def main():
     args.add_argument("-d", "--verbose", help="Run in debug mode", action="store_true")
     opts = args.parse_args()
 
-    if True or opts.verbose:
+    if opts.verbose:
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.DEBUG, encoding="utf-8")
     else:
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.INFO)
@@ -99,7 +99,7 @@ def main():
     APP = server.Server(opts.workdir)
     APP.set_ttl(opts.ttl)
 
-    if True or opts.verbose:
+    if opts.verbose:
         run(host='localhost', port=opts.port, debug=True)
     else:
         run(server="cheroot", host=opts.host, port=opts.port, debug=False)

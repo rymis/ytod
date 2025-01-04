@@ -18,3 +18,11 @@ User information is written in form of JSON file with following structure:
     "feeds": [ "a", "b", "c" ],
 }
 ```
+
+## Development
+To start python server you need to:
+1. Init venv for python `# python3 -m venv venv`
+2. Load venv: `# . ./venv/bin/activate`
+3. Create at least one user with password in ./workdir
+4. Run server: python -m ytod
+
