@@ -133,7 +133,11 @@ class FeedLoader:
     def load_feed(self, feed):
         " Load everything from a feed "
         data = self._db.get(feed, None)
+        if data is None:
+            self._update_feed(feed)
+            data = self._db.get(feed)
         return data
+
 
     def _update_feed(self, feed_id):
         feedname = YOUTUBE_URL + urllib.parse.quote_plus(feed_id)
