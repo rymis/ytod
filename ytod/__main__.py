@@ -136,6 +136,6 @@ def main():
     if opts.verbose:
         run(host=opts.host, port=opts.port, debug=True)
     else:
-        run(server="gunicorn", host=opts.host, port=opts.port, debug=False)
+        run(server="cheroot", host=opts.host, port=opts.port, debug=False)
 
 main()

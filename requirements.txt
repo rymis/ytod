@@ -5,4 +5,3 @@ requests==2.32.3
 setuptools==75.6.0
 urllib3==2.3.0
 cheroot==10.0.1
-gunicorn==23.0.0
