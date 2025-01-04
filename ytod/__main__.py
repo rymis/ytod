@@ -1,17 +1,38 @@
 #!/usr/bin/env python3
 
-from bottle import route, run, static_file, redirect, auth_basic, request
+from bottle import route, run, static_file, redirect, request, HTTPError
 import argparse
 import os
 from . import server
 from . import feed
 import logging
 import json
+import functools
 
 DEFAULT_WORKDIR = os.path.join(os.path.dirname(__file__), "workdir")
 WWWROOT = os.path.join(os.path.dirname(__file__), "wwwroot")
 
 APP = None
+
+def auth_basic(check):
+    """ Callback decorator to require HTTP auth (basic). """
+
+    def decorator(func):
+
+        @functools.wraps(func)
+        def wrapper(*a, **ka):
+            user, password = request.auth or (None, None)
+            if user is None and APP.ext_auth:
+                user = request.headers["remote-user"]
+            if user is None or not check(user, password):
+                err = HTTPError(401, "Authorization required")
+                err.add_header('WWW-Authenticate', 'Basic realm="private"')
+                return err
+            return func(*a, **ka)
+
+        return wrapper
+
+    return decorator
 
 def is_authenticated_user(user, password):
     return APP.check_user(user, password)
@@ -88,7 +109,11 @@ def main():
     args.add_argument("-w", "--workdir", help="Work directory", default=DEFAULT_WORKDIR)
     args.add_argument("-t", "--ttl", help="Videos time to live in days", default=30)
     args.add_argument("-d", "--verbose", help="Run in debug mode", action="store_true")
+    args.add_argument("-x", "--external-auth", help="Trust Remote-User parameter", action="store_true")
     opts = args.parse_args()
+
+    if os.getenv("YTOD_EXTERNAL_AUTH", "no") == "yes":
+        opts.external_auth = True
 
     if opts.verbose:
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.DEBUG, encoding="utf-8")
@@ -98,6 +123,8 @@ def main():
     os.makedirs(opts.workdir, exist_ok=True)
     APP = server.Server(opts.workdir)
     APP.set_ttl(opts.ttl)
+    if opts.external_auth:
+        APP.ext_auth = True
 
     if opts.verbose:
         run(host='localhost', port=opts.port, debug=True)

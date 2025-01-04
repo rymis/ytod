@@ -38,6 +38,7 @@ class Server:
         self._feed = feed.FeedLoader(workdir)
         self._yt = youtubedl.YouTubeDl(workdir)
         self._feed.run()
+        self.ext_auth = False
 
     def set_ttl(self, ttl):
         self._ttl = ttl
@@ -55,11 +56,17 @@ class Server:
         os.rename(tmp, fnm)
 
     def check_user(self, user, password):
+        if self.ext_auth:
+            fnm = os.path.join(self._workdir, "users", urllib.parse.quote(user) + ".json")
+            if not os.path.exists(fnm):
+                with open(fnm, "wt", encoding="utf-8") as out:
+                    out.write('{"password":"","feeds":[]}')
+            return True
         try:
             info = self._load_user(user)
             return password == info.get("password", None)
         except Exception as exc:
-            print("WARNING: ", exc)
+            logging.warning(f"Auth problem: {exc}")
             return False
 
     def list_user_feeds(self, user):
