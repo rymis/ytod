@@ -18,6 +18,6 @@ RUN ./venv/bin/pip install -r requirements.txt
 
 COPY ytod ytod
 
-# ENTRYPOINT [ "./venv/bin/python", "-m", "ytod", "-l", "0.0.0.0", "-p", "8000", "-w", "/data/workdir" ]
-ENTRYPOINT [ "/bin/sh" ]
+ENTRYPOINT [ "./venv/bin/python", "-m", "ytod", "-l", "0.0.0.0", "-p", "8000", "-w", "/data/workdir" ]
+# ENTRYPOINT [ "/bin/sh" ]
 
