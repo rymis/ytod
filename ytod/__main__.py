@@ -47,6 +47,11 @@ def server_static(filepath):
 def index():
     redirect("/ytod/static/index.html")
 
+@route('/ytod/')
+@auth_basic(is_authenticated_user)
+def index():
+    redirect("/ytod/static/index.html")
+
 @route('/ytod/api/feeds')
 @auth_basic(is_authenticated_user)
 def feeds():
