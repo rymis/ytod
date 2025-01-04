@@ -119,6 +119,8 @@ def main():
 
     if os.getenv("YTOD_EXTERNAL_AUTH", "no") == "yes":
         opts.external_auth = True
+    if os.getenv("YTOD_VERBOSE", "no") == "yes":
+        opts.verbose = True
 
     if opts.verbose:
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.DEBUG, encoding="utf-8")
@@ -132,8 +134,8 @@ def main():
         APP.ext_auth = True
 
     if opts.verbose:
-        run(host='localhost', port=opts.port, debug=True)
+        run(host=opts.host, port=opts.port, debug=True)
     else:
-        run(server="cheroot", host=opts.host, port=opts.port, debug=False)
+        run(server="gunicorn", host=opts.host, port=opts.port, debug=False)
 
 main()
