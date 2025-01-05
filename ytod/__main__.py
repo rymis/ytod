@@ -83,6 +83,13 @@ def video(id):
     d, n = os.path.split(APP.get_video(id))
     return static_file(n, root = d)
 
+@route('/ytod/api/remove')
+@auth_basic(is_authenticated_user)
+def video():
+    vid = request.query.video_id
+    APP.remove_video(vid)
+    return { "result": "ok" }
+
 @route('/ytod/api/image')
 @auth_basic(is_authenticated_user)
 def image():
