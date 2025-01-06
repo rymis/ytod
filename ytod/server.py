@@ -8,6 +8,8 @@ from . import youtubedl
 import dataclasses
 import logging
 import hashlib
+import time
+import threading
 
 log = logging.getLogger("server")
 
@@ -38,6 +40,8 @@ class Server:
         self._feed = feed.FeedLoader(workdir)
         self._yt = youtubedl.YouTubeDl(workdir)
         self._feed.run()
+        self._th = threading.Thread(target = lambda : self._cleanup())
+        self._th.start()
         self.ext_auth = False
 
     def set_ttl(self, ttl):
@@ -102,6 +106,9 @@ class Server:
     def load_video(self, item):
         u = self._yt.load(item)
 
+    def remove_video(self, watch_id):
+        self._yt.remove_video(watch_id)
+
     def get_video(self, link):
         if link.find("youtu") >= 0:
             id = _url_to_name(link)
@@ -127,4 +134,11 @@ class Server:
                 "lang": info.get("lang", "en"),
                 "feeds": info["feeds"],
         }
+
+    def _cleanup(self):
+        while True:
+            try:
+                self._yt.cleanup(self._ttl)
+            finally:
+                time.sleep(3600)
 

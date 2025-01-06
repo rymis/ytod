@@ -26,3 +26,33 @@ To start python server you need to:
 3. Create at least one user with password in ./workdir
 4. Run server: python -m ytod
 
+## API
+
+### Feeds
+```
+GET /ytod/api/feeds
+
+{
+    "id1": {
+        "title": "Title",
+        "items": [
+
+        ]
+    }
+}
+```
+
+### Search
+```
+GET /ytod/api/search?q=query
+
+{
+    "title": "Search results",
+    "items": [
+
+    ]
+}
+```
+
+### Download
+TODO...

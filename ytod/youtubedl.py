@@ -96,6 +96,12 @@ class YouTubeDl:
         " get filename for the video "
         return os.path.join(self._videodir, name + ".mp4")
 
+    def remove_video(self, name):
+        " Remove video by sha256 name "
+        nm = os.path.join(self._videodir, name + ".mp4")
+        if os.path.exists(nm):
+            os.unlink(nm)
+
     def search(self, query):
         _update_ytdl(self._workdir)
         p = sp.Popen([sys.executable, "-P", os.path.join(self._workdir, "yt_dlp.zip"),  "--dump-json", 
@@ -134,6 +140,7 @@ class YouTubeDl:
 
         return res
 
+
     def load_image(self, url):
         " Load image into cache and return filepath of the file "
         name = kvdb.hash_string(url) + ".jpg"
@@ -145,6 +152,26 @@ class YouTubeDl:
         with open(path, "wb") as out:
             out.write(data)
         return path
+
+
+    def cleanup(self, ttl_days = 30):
+        " Remove old videos and images "
+        log.info("Cleaning up old videos/images")
+        rubicon = time.time() - ttl_days * 86400
+        self._clean_dir(self._videodir, rubicon)
+        self._clean_dir(self._tbdir, rubicon)
+
+
+    def _clean_dir(self, path, rubicon):
+        for fnm in os.listdir(path):
+            p = os.path.join(path, fnm)
+            if os.path.isfile(p):
+                try:
+                    st = os.stat(p)
+                    if st.st_ctime < rubicon:
+                        os.unlink(p)
+                except Exception as exc:
+                    log.warning(f"Can't remove file: {p} ({exc})")
 
 
 if __name__ == '__main__':
