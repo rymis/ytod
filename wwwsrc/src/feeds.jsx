@@ -2,18 +2,18 @@ import m from "mithril";
 import { Feed } from "./feed.jsx";
 import { Header } from "./header.jsx";
 
-export let Index = {
+export let Feeds = {
     feeds: [],
 
     view: function () {
         allFeeds = [];
-        for (let feed in Index.feeds) {
-            allFeeds.push(<Feed feed={Index.feeds[feed]}/>);
+        for (let feed in Feeds.feeds) {
+            allFeeds.push(<Feed feed={Feeds.feeds[feed]} />);
         }
 
         return <div>
             <Header />
-            {allFeeds}
+            <div class="p-5">{allFeeds}</div>
         </div>;
     },
 
@@ -22,7 +22,7 @@ export let Index = {
             method: "GET",
             url: "/ytod/api/feeds",
         }).then((res) => {
-            Index.feeds = res;
+            Feeds.feeds = res;
         });
     }
 };

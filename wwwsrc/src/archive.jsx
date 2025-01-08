@@ -9,10 +9,9 @@ export var Archive = {
     },
 
     view: function () {
-        console.log(Archive.data);
         return <div>
             <Header />
-            <Feed feed={Archive.data} />
+            <Feed class="p-5" feed={Archive.data} />
         </div>;
     },
 
