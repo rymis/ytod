@@ -1,0 +1,6 @@
+dist/
+node_modules/
+index.js.map
+workdir
+__pycache__
+venv

@@ -6,12 +6,15 @@ export let Feed = {
 
         let items = [];
 
-        items.push(<div class="g--12 g-m--12"><h2>{data.title}</h2></div>);
-
         for (let item of data.items) {
             items.push(<Item item={item}></Item>);
         }
 
-        return <div class="container-wrap" style="width: 1024px">{items}</div>;
+        return (
+            <div class={vnode.attrs.class}>
+                <div class="py-4 text-center text-gray-800 text-lg">{data.title}</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">{items}</div>
+            </div>
+        );
     }
 };
