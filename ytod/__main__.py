@@ -14,6 +14,7 @@ WWWROOT = os.path.join(os.path.dirname(__file__), "wwwroot")
 
 APP = None
 
+
 def auth_basic(check):
     """ Callback decorator to require HTTP auth (basic). """
 

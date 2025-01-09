@@ -16,11 +16,12 @@ import json
 from . import feed
 from . import kvdb
 
-log = logging.getLogger("youtube");
+log = logging.getLogger("youtube")
 
 UPDATE_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
-TTL = 86400 * 3 # 3 days
-VIDEO_TTL = 86400 * 30 # 30 days
+TTL = 86400 * 3         # 3 days
+VIDEO_TTL = 86400 * 30  # 30 days
+
 
 def _update_ytdl(cache_dir):
     mod = os.path.join(cache_dir, "yt_dlp.zip")
@@ -54,7 +55,12 @@ def load_video(workdir, url, output, tmp, proxy):
         cmd = [sys.executable, "-P", os.path.join(workdir, "yt_dlp.zip")]
         if proxy:
             cmd.extend(["--proxy", proxy])
-        cmd.extend(["--no-playlist", "-f", "mp4[height<=?480][vcodec!=none][acodec!=none]", "--format-sort", "+res,+quality", "-o", tmp, url])
+        cmd.extend([
+            "--no-playlist",
+            "-f", "mp4[height<=?480][vcodec!=none][acodec!=none]",
+            "--format-sort", "+res,+quality",
+            "-o", tmp, url
+            ])
         sp.check_call(cmd)
         os.rename(tmp, output)
     except Exception as exc:
@@ -80,7 +86,13 @@ class YouTubeDl:
         output = kvdb.hash_string(item.link)
         nm = output + ".mp4"
         self._archive[output] = item
-        res = self._pool.apply_async(load_video, args = [ self._workdir, item.link, os.path.join(self._videodir, nm), os.path.join(self._tmpdir, nm), self.proxy ])
+        res = self._pool.apply_async(load_video, args=[
+                                    self._workdir,
+                                    item.link,
+                                    os.path.join(self._videodir, nm),
+                                    os.path.join(self._tmpdir, nm),
+                                    self.proxy
+                                    ])
 
     def list(self):
         " List all downloaded videos "
@@ -113,16 +125,18 @@ class YouTubeDl:
         if self.proxy:
             cmd.extend(["--proxy", self.proxy])
         cmd.extend(["--dump-json",
-            "--default-search", "ytsearch",
-            "--no-playlist", "--no-check-certificate", "--geo-bypass",
-            "--flat-playlist", "--skip-download", "--quiet", "--ignore-errors", f"ytsearch10:{query}"])
-        p = sp.Popen(cmd, stdout = sp.PIPE)
+                    "--default-search", "ytsearch",
+                    "--no-playlist", "--no-check-certificate",
+                    "--geo-bypass", "--flat-playlist",
+                    "--skip-download", "--quiet",
+                    "--ignore-errors", f"ytsearch10:{query}"])
+        p = sp.Popen(cmd, stdout=sp.PIPE)
         out = p.communicate()[0].decode('utf-8').split("\n")
         data = []
         for line in out:
             try:
                 data.append(json.loads(line))
-            except:
+            except _:
                 pass
 
         res = feed.Feed()
@@ -149,7 +163,6 @@ class YouTubeDl:
 
         return res
 
-
     def load_image(self, url):
         " Load image into cache and return filepath of the file "
         name = kvdb.hash_string(url) + ".jpg"
@@ -162,14 +175,12 @@ class YouTubeDl:
             out.write(data)
         return path
 
-
-    def cleanup(self, ttl_days = 30):
+    def cleanup(self, ttl_days=30):
         " Remove old videos and images "
         log.info("Cleaning up old videos/images")
         rubicon = time.time() - ttl_days * 86400
         self._clean_dir(self._videodir, rubicon)
         self._clean_dir(self._tbdir, rubicon)
-
 
     def _clean_dir(self, path, rubicon):
         for fnm in os.listdir(path):
