@@ -111,7 +111,7 @@ class YouTubeDl:
         _update_ytdl(self._workdir)
         cmd = [sys.executable, "-P", os.path.join(self._workdir, "yt_dlp.zip")]
         if self.proxy:
-            cmd.extend(["--proxy", proxy])
+            cmd.extend(["--proxy", self.proxy])
         cmd.extend(["--dump-json",
             "--default-search", "ytsearch",
             "--no-playlist", "--no-check-certificate", "--geo-bypass",
