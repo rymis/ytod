@@ -11,7 +11,7 @@ What we need to do to make it better
 * [ ] i18n/i10n
 
 ## Backend
-* [v] Possibility to use proxy
+* [x] Possibility to use proxy
 * [ ] mypy
 * [ ] pep8 style check
 * [ ] Download queue + retries
@@ -22,3 +22,4 @@ What we need to do to make it better
 * [ ] Quotas: remove old videos to download new ones even before TTL comes
 * [ ] Audio only: possibility to make podcasts from videos
 * [ ] Super low resolution videos for slow mobile networks
+* [ ] Tests
