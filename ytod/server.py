@@ -47,6 +47,9 @@ class Server:
     def set_ttl(self, ttl):
         self._ttl = ttl
 
+    def set_proxy(self, proxy):
+        self._yt.proxy = proxy
+
     def _load_user(self, user):
         fnm = os.path.join(self._workdir, "users", urllib.parse.quote(user) + ".json")
         with open(fnm, "rt", encoding="utf-8") as f:

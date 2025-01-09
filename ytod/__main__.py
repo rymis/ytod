@@ -115,6 +115,7 @@ def unsubscribe():
 
 def main():
     global APP
+    default_proxy = os.getenv("YTOD_PROXY", "")
     args = argparse.ArgumentParser(description="Run YouTube micro reader")
     args.add_argument("-p", "--port", help="Listen on port", default=12345)
     args.add_argument("-l", "--host", help="Listen on address", default="localhost")
@@ -122,6 +123,7 @@ def main():
     args.add_argument("-t", "--ttl", help="Videos time to live in days", default=30)
     args.add_argument("-d", "--verbose", help="Run in debug mode", action="store_true")
     args.add_argument("-x", "--external-auth", help="Trust Remote-User parameter", action="store_true")
+    args.add_argument("--proxy", help="Use proxy for yt-dlp", default=default_proxy)
     opts = args.parse_args()
 
     if os.getenv("YTOD_EXTERNAL_AUTH", "no") == "yes":
@@ -137,6 +139,8 @@ def main():
     os.makedirs(opts.workdir, exist_ok=True)
     APP = server.Server(opts.workdir)
     APP.set_ttl(opts.ttl)
+    if opts.proxy:
+        APP.set_proxy(opts.proxy)
     if opts.external_auth:
         APP.ext_auth = True
 

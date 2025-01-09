@@ -43,7 +43,7 @@ def _update_ytdl(cache_dir):
         os.rename(mod + ".tmp", mod)
 
 
-def load_video(workdir, url, output, tmp):
+def load_video(workdir, url, output, tmp, proxy):
     if os.path.exists(output):
         return
     _update_ytdl(workdir)
@@ -51,7 +51,11 @@ def load_video(workdir, url, output, tmp):
         # TODO: clean tmp directory
         if os.path.exists(tmp):
             os.unlink(tmp)
-        sp.check_call([sys.executable, "-P", os.path.join(workdir, "yt_dlp.zip"), "--no-playlist", "-f", "mp4[height<=?480][vcodec!=none][acodec!=none]", "--format-sort", "+res,+quality", "-o", tmp, url])
+        cmd = [sys.executable, "-P", os.path.join(workdir, "yt_dlp.zip")]
+        if proxy:
+            cmd.extend(["--proxy", proxy])
+        cmd.extend(["--no-playlist", "-f", "mp4[height<=?480][vcodec!=none][acodec!=none]", "--format-sort", "+res,+quality", "-o", tmp, url])
+        sp.check_call(cmd)
         os.rename(tmp, output)
     except Exception as exc:
         log.error(f"Can't load video: {exc}")
@@ -69,13 +73,14 @@ class YouTubeDl:
         os.makedirs(self._tbdir, exist_ok=True)
         self._archive = kvdb.KVDB(self._archivepath)
         self._pool = mp.Pool(1)
+        self.proxy = None
 
     def load(self, item: feed.Item):
         " Schedule video for load "
         output = kvdb.hash_string(item.link)
         nm = output + ".mp4"
         self._archive[output] = item
-        res = self._pool.apply_async(load_video, args = [ self._workdir, item.link, os.path.join(self._videodir, nm), os.path.join(self._tmpdir, nm) ])
+        res = self._pool.apply_async(load_video, args = [ self._workdir, item.link, os.path.join(self._videodir, nm), os.path.join(self._tmpdir, nm), self.proxy ])
 
     def list(self):
         " List all downloaded videos "
@@ -104,10 +109,14 @@ class YouTubeDl:
 
     def search(self, query):
         _update_ytdl(self._workdir)
-        p = sp.Popen([sys.executable, "-P", os.path.join(self._workdir, "yt_dlp.zip"),  "--dump-json", 
+        cmd = [sys.executable, "-P", os.path.join(self._workdir, "yt_dlp.zip")]
+        if self.proxy:
+            cmd.extend(["--proxy", proxy])
+        cmd.extend(["--dump-json",
             "--default-search", "ytsearch",
             "--no-playlist", "--no-check-certificate", "--geo-bypass",
-            "--flat-playlist", "--skip-download", "--quiet", "--ignore-errors", f"ytsearch10:{query}"], stdout = sp.PIPE)
+            "--flat-playlist", "--skip-download", "--quiet", "--ignore-errors", f"ytsearch10:{query}"])
+        p = sp.Popen(cmd, stdout = sp.PIPE)
         out = p.communicate()[0].decode('utf-8').split("\n")
         data = []
         for line in out:
