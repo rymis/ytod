@@ -1,0 +1,11 @@
+#: src/header.jsx:11
+msgid "Feeds"
+msgstr ""
+
+#: src/header.jsx:12
+msgid "Search"
+msgstr "Hledani"
+
+#: src/header.jsx:13
+msgid "Archive"
+msgstr "Archiv"
