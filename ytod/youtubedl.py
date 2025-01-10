@@ -44,7 +44,7 @@ def _update_ytdl(cache_dir):
         os.rename(mod + ".tmp", mod)
 
 
-def load_video(workdir, item: feed.Item, proxy = None):
+def load_video(workdir, item: feed.Item, proxy=None):
     output = os.path.join(workdir, "video", item.watch + ".mp4")
     tmp = os.path.join(workdir, "tmp", item.watch + ".mp4")
     os.makedirs(os.path.join(workdir, "video"), exist_ok=True)
@@ -65,15 +65,19 @@ def load_video(workdir, item: feed.Item, proxy = None):
             cmd = [sys.executable, "-P", os.path.join(workdir, "yt_dlp.zip")]
             if proxy:
                 cmd.extend(["--proxy", proxy])
-            cmd.extend([
-                "--no-playlist",
-                "-f", "mp4[height<=?480][vcodec!=none][acodec!=none]"])
+            cmd.extend(["--no-playlist"])
             if i == 0:
-                cmd.extend(["--format-sort", "+res,+quality"])
+                cmd.extend([
+                    "-f", "mp4[height<=?480][vcodec!=none][acodec!=none]",
+                    "--format-sort", "+res,+quality"
+                ])
             cmd.extend(["-o", tmp, url])
             res = sp.run(cmd, stderr=sp.PIPE)
             if res.returncode == 0:
-                os.rename(tmp, output)
+                if os.path.exists(tmp):
+                    os.rename(tmp, output)
+                elif os.path.exists(tmp + ".webm"):
+                    os.rename(tmp + ".webm", output)
                 return None
             err.append(res.stderr.decode('utf-8', 'replace'))
         except Exception as exc:
@@ -124,5 +128,3 @@ def search(workdir, query, proxy):
         res.items.append(e)
 
     return res
-
-

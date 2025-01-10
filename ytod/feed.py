@@ -20,11 +20,13 @@ https://www.youtube.com/feeds/videos.xml?channel_id=THE_CHANNEL_ID_HERE
 """
 YOUTUBE_URL = "https://www.youtube.com/feeds/videos.xml?channel_id="
 
+
 @dataclass
 class Thumbnail:
     url: str = ""
     width: str = ""
     height: str = ""
+
 
 @dataclass
 class Item:
@@ -68,17 +70,20 @@ class Item:
             self.thumbnail.width = j.get("thumbnail_width", "")
             self.thumbnail.height = j.get("thumbnail_height", "")
 
+
 @dataclass
 class Feed:
     title: str = ""
-    items: typing.List[Item] = dataclasses.field(default_factory=lambda:[])
+    items: typing.List[Item] = dataclasses.field(default_factory=lambda: [])
 
     def prepare_ids(self):
         " Prepare video-ids for use in download methods "
         for item in self.items:
             item.video_id = item.encode()
             if item.thumbnail:
-                item.thumbnail.url = "/ytod/api/image?url=" + urllib.parse.quote_plus(item.thumbnail.url)
+                qurl = urllib.parse.quote_plus(item.thumbnail.url)
+                item.thumbnail.url = "/ytod/api/image?url=" + qurl
+
 
 def load_feed(feed_id: str) -> Feed:
     " Load users feed by id "
@@ -112,17 +117,16 @@ def load_feed(feed_id: str) -> Feed:
         thumbnail = None
         for tb in n.get("media_thumbnail", []):
             if "url" in tb:
-                item.thumbnail = Thumbnail(url=tb.get("url"), width=tb.get("width", "480"), height=tb.get("height", "360"))
+                item.thumbnail = Thumbnail(
+                    url=tb.get("url"),
+                    width=tb.get("width", "480"),
+                    height=tb.get("height", "360"))
                 break
 
         news[n.link] = item
 
-    news = [ n for _, n in news.items() ]
-    news.sort(key = lambda n : -n.time)
+    news = [n for _, n in news.items()]
+    news.sort(key=lambda n: -n.time)
     data.items = news
 
     return data
-
-
-if __name__ == '__main__':
-    print(load_feed("UCCV5Z2DEYnUGIY_mO-AcQKw"))

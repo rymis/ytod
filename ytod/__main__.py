@@ -35,28 +35,34 @@ def auth_basic(check):
 
     return decorator
 
+
 def is_authenticated_user(user, password):
     return APP.check_user(user, password)
+
 
 @route('/ytod/static/<filepath:path>')
 @auth_basic(is_authenticated_user)
 def server_static(filepath):
     return static_file(filepath, root=WWWROOT)
 
+
 @route('/')
 @auth_basic(is_authenticated_user)
 def index():
     redirect("/ytod/static/index.html")
+
 
 @route('/ytod/')
 @auth_basic(is_authenticated_user)
 def index():
     redirect("/ytod/static/index.html")
 
+
 @route('/ytod/api/feeds')
 @auth_basic(is_authenticated_user)
 def feeds():
     return APP.list_user_feeds(request.auth[0])
+
 
 @route('/ytod/api/search')
 @auth_basic(is_authenticated_user)
@@ -64,30 +70,35 @@ def feeds():
     query = request.query.q
     return APP.search(query)
 
+
 @route('/ytod/api/download', method="POST")
 @auth_basic(is_authenticated_user)
 def download():
     body = json.load(request.body)
     APP.load_video(body["video_id"])
-    return { "result": "OK" }
+    return {"result": "OK"}
+
 
 @route('/ytod/api/local_videos')
 @auth_basic(is_authenticated_user)
 def local_video():
-    return { "result": APP.local_videos() }
+    return {"result": APP.local_videos()}
+
 
 @route('/ytod/api/video/:id')
 @auth_basic(is_authenticated_user)
 def video(id):
     d, n = os.path.split(APP.get_video(id))
-    return static_file(n, root = d)
+    return static_file(n, root=d)
+
 
 @route('/ytod/api/remove')
 @auth_basic(is_authenticated_user)
 def video():
     vid = request.query.video_id
     APP.remove_video(vid)
-    return { "result": "ok" }
+    return {"result": "ok"}
+
 
 @route('/ytod/api/image')
 @auth_basic(is_authenticated_user)
@@ -95,22 +106,26 @@ def image():
     url = request.query.url
     path = APP.get_image(url)
     d, n = os.path.split(path)
-    return static_file(n, root = d)
+    return static_file(n, root=d)
+
 
 @route('/ytod/api/user_info')
 @auth_basic(is_authenticated_user)
 def user_info():
     return APP.get_user_info(request.auth[0])
 
+
 @route('/ytod/api/subscribe')
 @auth_basic(is_authenticated_user)
 def subscribe():
     return APP.subscribe(request.auth[0], request.query.channel_id)
 
+
 @route('/ytod/api/unsubscribe')
 @auth_basic(is_authenticated_user)
 def unsubscribe():
     return APP.unsubscribe(request.auth[0], request.query.channel_id)
+
 
 def main():
     global APP
@@ -145,5 +160,6 @@ def main():
         run(host=opts.host, port=opts.port, debug=True)
     else:
         run(server="cheroot", host=opts.host, port=opts.port, debug=False)
+
 
 main()

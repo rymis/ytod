@@ -13,9 +13,9 @@ What we need to do to make it better
 ## Backend
 * [x] Possibility to use proxy
 * [ ] mypy
-* [ ] pep8 style check
-* [ ] Download queue + retries
-* [ ] Error messages for not-downloaded videos
+* [x] pep8 style check
+* [x] Download queue + retries (partially)
+* [x] Error messages for not-downloaded videos
 * [ ] Personal downloaded feed
 * [ ] Documentation for docker/deployment
 * [ ] Better database: descriptions for downloaded videos

@@ -15,6 +15,7 @@ import multiprocessing as mp
 
 log = logging.getLogger("server")
 
+
 def dc_to_json(obj):
     if dataclasses.is_dataclass(obj):
         tmp = dataclasses.asdict(obj)
@@ -23,16 +24,18 @@ def dc_to_json(obj):
             res[nm] = dc_to_json(val)
         return res
     elif isinstance(obj, list):
-        return [ dc_to_json(x) for x in obj ]
+        return [dc_to_json(x) for x in obj]
     elif isinstance(obj, dict):
-        return { k : dc_to_json(v) for k, v in obj.items() }
+        return {k: dc_to_json(v) for k, v in obj.items()}
     else:
         return obj
+
 
 def _verify_watch_id(s):
     for c in s:
         if c not in "abcdef0123456789":
             raise RuntimeError("Don't try to hack me")
+
 
 def _url_to_name(url):
     return hashlib.sha224(url.encode('utf-8')).hexdigest()
@@ -76,7 +79,7 @@ class Server:
 
         self._db = self._open_db()
 
-        self._th = threading.Thread(target = lambda : self._background())
+        self._th = threading.Thread(target=lambda: self._background())
         self._th.start()
         self._yt = mp.Process(target=_ytdlp_main, args=(self._workdir, proxy))
         self._yt.start()
@@ -95,7 +98,7 @@ class Server:
         if self.ext_auth:
             info = self._load_user(user)
             if info is None:
-                self._save_user(user, { "password": "", "feeds": [] })
+                self._save_user(user, {"password": "", "feeds": []})
             return True
 
         try:
@@ -128,11 +131,11 @@ class Server:
 
     def unsubscribe(self, user, channel_id):
         info = self._load_user(user)
-        l = []
+        subscriptions = []
         for item in info["feeds"]:
             if item != channel_id:
-                l.append(item)
-        info["feeds"] = l
+                subscriptions.append(item)
+        info["feeds"] = subscriptions
         self._save_user(user, info)
 
     def load_video(self, video_id: str):
@@ -197,9 +200,9 @@ class Server:
     def get_user_info(self, user):
         info = self._load_user(user)
         return {
-                "name": user,
-                "lang": info.get("lang", "en"),
-                "feeds": info["feeds"],
+            "name": user,
+            "lang": info.get("lang", "en"),
+            "feeds": info["feeds"],
         }
 
     def has_video(self, name):
@@ -208,8 +211,8 @@ class Server:
 
     def _background(self):
         last_updates = {
-                "cleanup": [ 0.0, 3600.0, self._yt_cleanup ],
-                "feeds": [ 0.0, 600.0, self._feed_update ],
+            "cleanup": [0.0, 3600.0, self._yt_cleanup],
+            "feeds": [0.0, 600.0, self._feed_update],
         }
 
         while True:
@@ -259,15 +262,15 @@ class Server:
             new = feed.load_feed(feed_id)
 
             res.title = new.title
-            news = { }
+            news = {}
             if old is not None:
                 for item in old.items:
                     news[item.link] = item
             for item in new.items:
                 news[item.link] = item
 
-            news = [ n for _, n in news.items() ]
-            news.sort(key = lambda n : -n.time)
+            news = [n for _, n in news.items()]
+            news.sort(key=lambda n: -n.time)
             if len(news) > 100:
                 news = news[:100]
             res.items = news
@@ -286,4 +289,3 @@ class Server:
 
     def _open_db(self):
         return db.DB(os.path.join(self._workdir, "data.db"))
-
