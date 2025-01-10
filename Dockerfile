@@ -1,6 +1,6 @@
 FROM alpine:3.21
 
-RUN apk add python3 ffmpeg py3-pip python3-gdbm
+RUN apk add python3 ffmpeg py3-pip
 
 RUN adduser -D ytod
 RUN mkdir /ytod

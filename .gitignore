@@ -4,3 +4,7 @@ index.js.map
 workdir
 __pycache__
 venv
+yt_dlp.zip
+messages.*.json
+*.po~
+messages.pot

@@ -1,22 +1,17 @@
-YouTube OnDemand
+YourTelevision OnDemand
 ================
 
-The way to watch YouTube videos from Russia and other depressive countries without limitations.
+The way to watch YouTube videos from Russia and other depressive and repressive countries without limitations.
 
 ## Directory structure
 Cache directory contains all needed information for the application. It has:
-* users - contains information about users
 * video - contains downloaded videos
-* feeds.db - KV database with all known feeds
-* archive.db - Information about downloaded videos
+* data.db - SQLite database with all needed information
 
 ### User record
-User information is written in form of JSON file with following structure:
-```json
-{
-    "password": "12345678",
-    "feeds": [ "a", "b", "c" ],
-}
+It is highly recommended to use external authentication. But if you want to use internal one, you can add user using command:
+```
+python3 -m ytod.db <path-to-workdir> user password
 ```
 
 ## Development

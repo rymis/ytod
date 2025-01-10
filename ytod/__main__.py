@@ -68,9 +68,7 @@ def feeds():
 @auth_basic(is_authenticated_user)
 def download():
     body = json.load(request.body)
-    item = feed.Item()
-    item.decode(body["video_id"])
-    APP.load_video(item)
+    APP.load_video(body["video_id"])
     return { "result": "OK" }
 
 @route('/ytod/api/local_videos')
@@ -138,10 +136,8 @@ def main():
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.INFO)
 
     os.makedirs(opts.workdir, exist_ok=True)
-    APP = server.Server(opts.workdir)
-    APP.set_ttl(opts.ttl)
-    if opts.proxy:
-        APP.set_proxy(opts.proxy)
+    APP = server.Server(opts.workdir, opts.proxy)
+
     if opts.external_auth:
         APP.ext_auth = True
 
