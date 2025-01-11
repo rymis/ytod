@@ -1,6 +1,7 @@
 import m from "mithril";
 import { Feed } from "./feed.jsx";
 import { Header } from "./header.jsx";
+import { Notifications } from "./components/notifications.jsx";
 
 export let Feeds = {
     feeds: [],
@@ -11,10 +12,7 @@ export let Feeds = {
             allFeeds.push(<Feed feed={Feeds.feeds[feed]} />);
         }
 
-        return <div>
-            <Header />
-            <div class="p-5">{allFeeds}</div>
-        </div>;
+        return (<div class="p-5">{allFeeds}</div>);
     },
 
     updateFeed: function () {

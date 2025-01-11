@@ -1,5 +1,4 @@
 import { Feed } from "./feed.jsx";
-import { Header } from "./header.jsx";
 import { SearchInput } from "./components/searchInput.jsx";
 import m from "mithril";
 
@@ -25,15 +24,12 @@ export let Search = {
 
     view: function (vnode) {
         return (
-            <div>
-                <Header />
-                <div class="p-6">
-                    <SearchInput id="search_query" onSearch={doSearch} />
-                    <div>
-                        <div class={this.loading ? null : "hidden"}>Loading...</div>
-                        <div class={!this.loading ? null : "hidden"}>
-                            <Feed feed={Search.result} />
-                        </div>
+            <div class="p-6">
+                <SearchInput id="search_query" onSearch={doSearch} />
+                <div>
+                    <div class={this.loading ? null : "hidden"}>Loading...</div>
+                    <div class={!this.loading ? null : "hidden"}>
+                        <Feed feed={Search.result} />
                     </div>
                 </div>
             </div>

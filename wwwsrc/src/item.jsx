@@ -2,6 +2,7 @@ import m from "mithril";
 import { isSubscribed, updateUserInfo } from "./globals.js";
 import { Button } from "./components/button.jsx";
 import { Modal } from "./components/modal.jsx";
+import { addNotification } from "./components/notifications.jsx";
 
 function getDownloadCb(item) {
     return (function (video_id) {
@@ -13,7 +14,7 @@ function getDownloadCb(item) {
                     video_id: video_id,
                 },
             }).then((res) => {
-                alert(JSON.stringify(res));
+                addNotification('Video was successfully queued', 'success')
             });
         };
     })(item.video_id);

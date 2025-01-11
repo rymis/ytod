@@ -1,4 +1,3 @@
-import { Header } from "./header.jsx";
 import { Feed } from "./feed.jsx";
 import m from "mithril";
 
@@ -9,10 +8,7 @@ export var Archive = {
     },
 
     view: function () {
-        return <div>
-            <Header />
-            <Feed class="p-5" feed={Archive.data} />
-        </div>;
+        return <Feed class="p-5" feed={Archive.data} />;
     },
 
     update: function () {
