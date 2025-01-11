@@ -1,6 +1,7 @@
 FROM alpine:3.21
 
-RUN apk add python3 py3-pip make
+RUN apk add python3 py3-pip make nodejs npm
+RUN rm -rf /var/cache/apk/*
 
 RUN adduser -D ytod
 RUN mkdir /ytod
@@ -9,6 +10,7 @@ WORKDIR /ytod
 RUN mkdir -p workdir
 COPY requirements.txt requirements.txt
 COPY Makefile Makefile
+COPY wwwsrc wwwsrc
 
 RUN chown -R ytod:ytod /ytod
 
@@ -16,6 +18,8 @@ RUN python -m venv venv
 RUN ./venv/bin/pip install -r requirements.txt
 
 COPY ytod ytod
+
+RUN (cd wwwsrc; make)
 
 ENTRYPOINT [ "make", "test" ]
 # ENTRYPOINT [ "/bin/sh" ]

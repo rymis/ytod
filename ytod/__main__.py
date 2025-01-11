@@ -9,7 +9,7 @@ import logging
 import json
 import functools
 
-DEFAULT_WORKDIR = os.path.join(os.path.dirname(__file__), "workdir")
+DEFAULT_WORKDIR = os.path.abspath("./workdir")
 WWWROOT = os.path.join(os.path.dirname(__file__), "wwwroot")
 
 APP = None
