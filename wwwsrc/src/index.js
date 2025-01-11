@@ -36,11 +36,8 @@ function render(component) {
     return {
         view: function (vnode) {
             const route = m.route.get();
-            if (route !== render.lastRoute) {
-                const updater = routeUpdaters[route];
-                if (typeof(updater) !== "undefined") {
-                    updater();
-                }
+            if (route !== render.lastRoute && routeUpdaters.hasOwnProperty(route)) {
+                routeUpdaters[route]();
             }
             render.lastRoute = route;
 
