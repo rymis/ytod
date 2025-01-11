@@ -44,7 +44,7 @@ def _url_to_name(url):
 def _ytdlp_main_loop(workdir, proxy):
     queue = db.DB(os.path.join(workdir, "data.db"))
     while True:
-        item = queue.queue_pop()
+        item = queue.queue_get()
         if item is None:
             time.sleep(10)
             continue
@@ -145,7 +145,7 @@ class Server:
         key = _url_to_name(item.link)
         self._db.kv_set("archive", key, item)
         item.watch = key
-        self._db.queue_push(item)
+        self._db.queue_put(item)
 
     def remove_video(self, watch_id):
         " Remove video by sha256 name "

@@ -61,14 +61,16 @@ class DB:
             for key, val in cur.execute("SELECT key, value FROM kv WHERE domain = ?;", (domain,)).fetchall():
                 yield key, _decode(val)
 
-    def queue_push(self, value):
+    def queue_put(self, value):
+        " Put value into the queue "
         with self._lock:
             cur = self._conn.cursor()
             cur.execute("BEGIN;")
             cur.execute("INSERT INTO queue (item) VALUES (?)", (_encode(value),))
             cur.execute("COMMIT;")
 
-    def queue_pop(self):
+    def queue_get(self):
+        " Get next value from queue "
         with self._lock:
             cur = self._conn.cursor()
             res = None
