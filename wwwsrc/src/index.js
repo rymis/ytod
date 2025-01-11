@@ -27,13 +27,28 @@ export const pages = {
     archive: 'archive',
 };
 
+const routeUpdaters = {
+    "index": () => Feeds.updateFeed(),
+    "archive": () => Archive.update(),
+}
+
 function render(component) {
     return {
         view: function (vnode) {
+            const route = m.route.get();
+            if (route != render.lastRoute) {
+                const updater = routeUpdaters[route];
+                if (typeof(updater) !== "undefined") {
+                    updater();
+                }
+            }
+            render.lastRoute = route;
+
             return m(Main, m(component, vnode.attrs));
         }
     }
 }
+render.lastRoute = "index";
 
 window.onload = function () {
     updateUserInfo();
