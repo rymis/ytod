@@ -1,5 +1,6 @@
 import m from "mithril";
 import { messages } from "./messages.js";
+import { Main } from "./main.jsx";
 import { Feeds } from "./feeds.jsx";
 import { Watch } from "./watch.jsx";
 import { Search } from "./search.jsx";
@@ -26,6 +27,14 @@ export const pages = {
     archive: 'archive',
 };
 
+function render(component) {
+    return {
+        view: function (vnode) {
+            return m(Main, m(component, vnode.attrs));
+        }
+    }
+}
+
 window.onload = function () {
     updateUserInfo();
     Archive.update();
@@ -40,10 +49,10 @@ window.onload = function () {
     }
 
     m.route(document.body, "/index", {
-        "/index": Feeds,
-        "/watch/:videoid": Watch,
-        "/search": Search,
-        "/archive": Archive,
+        "/index": render(Feeds),
+        "/watch/:videoid": render(Watch),
+        "/search": render(Search),
+        "/archive": render(Archive),
     });
 
     Feeds.updateFeed();
