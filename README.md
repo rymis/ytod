@@ -1,5 +1,6 @@
 YourTelevision OnDemand
 ================
+[![Docker Image CI](https://github.com/rymis/ytod/actions/workflows/docker-test-image.yml/badge.svg)](https://github.com/rymis/ytod/actions/workflows/docker-test-image.yml)
 
 The way to watch YouTube videos from Russia and other depressive and repressive countries without limitations.
 
