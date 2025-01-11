@@ -17,6 +17,9 @@ install: all
 	cp dist/index.js.map ../ytod/wwwroot/index.js.map
 	cp dist/styles.css ../ytod/wwwroot/index.css
 
+dev:
+	node devserver.mjs
+
 xgettext: src/messages.js
 
 src/messages.js: $(JSMSG_FILES)
@@ -29,3 +32,5 @@ $(PO_FILES):
 	mkdir -p ./locales
 	xgettext -L JavaScript -o locales/messages.pot --keyword=t ./src/*.js* ./src/components/*.js*
 	for po in $(PO_FILES); do if [ \-f "$$po" ]; then msgmerge --update "$$po" locales/messages.pot; else msginit "$$po" -i locales/messages.pot; fi; done
+
+.PHONY: xgettext dev
