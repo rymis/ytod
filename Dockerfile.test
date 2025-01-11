@@ -19,8 +19,10 @@ RUN ./venv/bin/pip install -r requirements.txt
 
 COPY ytod ytod
 
+# Tests to run:
 RUN (cd wwwsrc; make)
+RUN make test
 
-ENTRYPOINT [ "make", "test" ]
+ENTRYPOINT [ "sleep", "infinity" ]
 # ENTRYPOINT [ "/bin/sh" ]
 
