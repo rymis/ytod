@@ -13,9 +13,9 @@ def random_filename():
     return os.path.join(tempfile.gettempdir(), f"tmp_{int(time.time() * 1000)}_{random.randrange(1000000)}")
 
 
-def random_string(l = 16):
+def random_string(length=16):
     res = []
-    for i in range(l):
+    for i in range(length):
         res.append(random.choice("qwertyuiopasdfghjklzxcvbnm1234567890"))
     return "".join(res)
 
@@ -36,7 +36,7 @@ class TmpDB(db.DB):
 class DBTest(unittest.TestCase):
     def test_kv_simple(self):
         with TmpDB() as db:
-            data = { random_string(8): random_string(16) for i in range(1000) }
+            data = {random_string(8): random_string(16) for i in range(1000)}
             for k, v in data.items():
                 db.kv_set("a", k, v)
             for k, v in data.items():

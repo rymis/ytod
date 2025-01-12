@@ -10,6 +10,7 @@ from dataclasses import dataclass
 import dataclasses
 import typing
 import base64
+import os
 
 
 log = logging.getLogger("rss")
@@ -19,6 +20,10 @@ RSS client here:
 https://www.youtube.com/feeds/videos.xml?channel_id=THE_CHANNEL_ID_HERE
 """
 YOUTUBE_URL = "https://www.youtube.com/feeds/videos.xml?channel_id="
+
+
+if os.getenv("YTOD_OVERRIDE_YOUTUBE_URL"):
+    YOUTUBE_URL = os.getenv("YTOD_OVERRIDE_YOUTUBE_URL")
 
 
 @dataclass
