@@ -75,6 +75,7 @@ class Server:
         self._proxy = proxy
         tbdir = os.path.join(self._workdir, "thumbnails")
         os.makedirs(tbdir, exist_ok=True)
+        os.makedirs(os.path.join(self._workdir, "video"), exist_ok=True)
         self._ttl = 30
 
         self._db = self._open_db()
