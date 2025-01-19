@@ -11,6 +11,7 @@ RUN mkdir -p workdir
 COPY requirements.txt requirements.txt
 COPY Makefile Makefile
 COPY wwwsrc wwwsrc
+COPY integration_test integration_test
 
 RUN chown -R ytod:ytod /ytod
 
