@@ -11,7 +11,7 @@ function triggerSearch(e) {
 export const SearchInput = {
   view: function (vnode) {
     return (
-      <div class="flex items-center max-w-sm mx-auto">
+      <search class="flex items-center max-w-sm mx-auto">
         <label for={vnode.attrs.id} class="sr-only">{t("Search")}</label>
         <div class="relative w-full">
           <input
@@ -33,7 +33,7 @@ export const SearchInput = {
           </svg>
           <span class="sr-only">Search</span>
         </button>
-      </div>
+      </search>
     );
   }
 };
