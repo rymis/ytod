@@ -137,6 +137,8 @@ def main():
     args.add_argument("-t", "--ttl", help="Videos time to live in days", default=30)
     args.add_argument("-d", "--verbose", help="Run in debug mode", action="store_true")
     args.add_argument("-x", "--external-auth", help="Trust Remote-User parameter", action="store_true")
+    args.add_argument("--video-size", type=int, help="Limit video directory size in Mbs", default=-1)
+    args.add_argument("--thumbnail-size", type=int, help="Limit thumbnail directory size in Mbs", default=-1)
     args.add_argument("--proxy", help="Use proxy for yt-dlp", default=default_proxy)
     opts = args.parse_args()
 
@@ -144,6 +146,10 @@ def main():
         opts.external_auth = True
     if os.getenv("YTOD_VERBOSE", "no") == "yes":
         opts.verbose = True
+    if val := os.getenv("YTOD_VIDEO_SIZE"):
+        opts.video_size = int(val)
+    if val := os.getenv("YTOD_THUMBNAIL_SIZE"):
+        opts.thumbnail_size = int(val)
 
     if opts.verbose:
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.DEBUG, encoding="utf-8")
@@ -151,10 +157,14 @@ def main():
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.INFO)
 
     os.makedirs(opts.workdir, exist_ok=True)
-    APP = server.Server(opts.workdir, opts.proxy)
+    APP = server.Server(opts.workdir, opts.proxy, video_size=opts.video_size, thumbnail_size=opts.thumbnail_size)
 
     if opts.external_auth:
         APP.ext_auth = True
+    if opts.video_size:
+        APP.video_size = opts.video_size
+    if opts.thumbnail_size:
+        APP.thumbnail_size = opts.thumbnail_size
 
     if opts.verbose:
         run(host=opts.host, port=opts.port, debug=True)
