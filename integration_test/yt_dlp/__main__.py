@@ -22,8 +22,8 @@ def do_search(query):
                 "thumbnails": [
                     {
                         "url": f"http://localhost:18321/thumbnail?v={video_id}",
-                        "width": "64",
-                        "height": 64,
+                        "width": "256",
+                        "height": 192,
                     }
                 ]
         }
