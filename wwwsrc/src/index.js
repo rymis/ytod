@@ -1,11 +1,11 @@
 import m from "mithril";
 import { messages } from "./messages.js";
 import { Main } from "./main.jsx";
-import { Feeds } from "./feeds.jsx";
-import { Watch } from "./watch.jsx";
-import { Search } from "./search.jsx";
+import { Feeds } from "./pages/feeds.jsx";
+import { Watch } from "./pages/watch.jsx";
+import { Search } from "./pages/search.jsx";
 import { updateUserInfo } from "./globals.js";
-import { Archive } from "./archive.jsx";
+import { Archive } from "./pages/archive.jsx";
 
 window.mCreateElement = m;
 window.mFragment = { view: vnode => vnode.children };

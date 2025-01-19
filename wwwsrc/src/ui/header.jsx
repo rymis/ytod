@@ -1,5 +1,5 @@
-import { NavItem } from "./components/navItem";
-import { pages } from ".";
+import { NavItem } from '../components/navItem';
+import { pages } from "..";
 import m from 'mithril';
 
 export var Header = {

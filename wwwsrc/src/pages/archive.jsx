@@ -1,4 +1,4 @@
-import { Feed } from "./feed.jsx";
+import { Feed } from "../ui/feed.jsx";
 import m from "mithril";
 
 export var Archive = {

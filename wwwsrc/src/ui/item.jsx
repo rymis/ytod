@@ -1,8 +1,10 @@
 import m from "mithril";
-import { isSubscribed, updateUserInfo } from "./globals.js";
-import { Button } from "./components/button.jsx";
-import { Modal } from "./components/modal.jsx";
-import { addNotification } from "./components/notifications.jsx";
+import { isSubscribed, updateUserInfo } from "../globals.js";
+import { Button } from "../components/button.jsx";
+import { Modal, showModal } from "../components/modal.jsx";
+import { guid } from "../utils/service.js";
+import { addNotification } from "../components/notifications.jsx";
+import { getTimeSpanText } from "../utils/datetime.js";
 
 function getDownloadCb(item) {
     return (function (video_id) {
@@ -44,15 +46,9 @@ function getSubscribeCb(item, isSubscribe) {
     })(item.channel_id, isSubscribe ? "subscribe" : "unsubscribe");
 }
 
-function showDescription(e) {
-    e.preventDefault();
-    Item.Modal.show(); 
-}
-
 export let Item = {
-    last_id: 0,
+    id: guid(),
     descriptionOpen: false,
-
     view: function (vnode) {
         let item = vnode.attrs.item;
 
@@ -64,29 +60,24 @@ export let Item = {
         let video = item.watch ?
             <Button color="green" size="xs" onClick={getWatchCb(item)} name="Watch" /> :
             <Button color="yellow" size="xs" onClick={getDownloadCb(item)} name="Download" />;
-        let description = <span />;
         let subscribe;
         if (!isSubscribed(item.channel_id)) {
             subscribe = <Button color="blue" size="xs" onClick={getSubscribeCb(item, true)} name="Subscribe" />;
         } else {
             subscribe = <Button color="red" size="xs" onClick={getSubscribeCb(item, false)} name="Unsubscribe" />;
         }
-
-        if (item.description) {
-            let id = Item.last_id++;
-            description =
-                <div class="">
-                    <input type="checkbox" id={`item-collapsible-${id}`} />
-                    <label for={`item-collapsible-${id}`}>Description</label>
-                    <div class={`item-collapsible-${id}-area`}>
-                        <div class="hidden">{item.description}</div>
-                    </div>
-                </div>;
-        }
+        const modalId = `description-modal-${this.id}`;
         return (
-            <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <div
+                class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+            >
                 {thumbnail}
-                <div class="font-bold text-gray-600 pb-2">{item.title}</div>
+                <div class="flex justify-between">
+                    <span class="font-bold text-gray-600">{item.title}</span>
+                    {item.description && <button class="w-4 h-4 shrink-0 self-center" type="button" onclick={showModal(modalId)}>
+                        <img src="info.svg" />
+                    </button>}
+                </div>
                 <a class="underline underline-offset-1 italic" href={item.link}>Watch on YouTube</a><br />
                 <span class="text-gray-800 font-semibold text-sm">Channel </span>
                 <span class="text-gray-600 uppercase">{item.channel}</span>
@@ -94,7 +85,21 @@ export let Item = {
                     {subscribe}
                     {video}
                 </div>
-                <Modal header="Description" content={description} modalId="description-modal" open={this.descriptionOpen} />
+                <div class="text-gray-500 text-sm">{getTimeSpanText(item.time)}</div>
+                <Modal
+                    name="description"
+                    header={item.channel}
+                    content={item.description}
+                    modalId={modalId}
+                    class="max-h-[80%] w-[80%] md:w-2/3 lg:w-1/2"
+                >
+                    <div class="px-3 py-2">
+                        <h4 class="font-semibold text-gray-700 dark:text-white pb-3">{item.title}</h4>
+                        <p>
+                            {item.description}
+                        </p>
+                    </div>
+                </Modal>
             </div >
         );
     }
