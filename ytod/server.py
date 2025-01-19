@@ -12,6 +12,7 @@ import hashlib
 import time
 import threading
 import multiprocessing as mp
+from typing import Optional, Any
 
 log = logging.getLogger("server")
 
@@ -41,7 +42,7 @@ def _url_to_name(url):
     return hashlib.sha224(url.encode('utf-8')).hexdigest()
 
 
-def _ytdlp_main_loop(workdir, proxy):
+def _ytdlp_main_loop(workdir: str, proxy: Optional[str]):
     queue = db.DB(os.path.join(workdir, "data.db"))
     while True:
         item = queue.queue_get()
@@ -59,7 +60,7 @@ def _ytdlp_main_loop(workdir, proxy):
             pass
 
 
-def _ytdlp_main(workdir, proxy):
+def _ytdlp_main(workdir: str, proxy: Optional[str]):
     while True:
         try:
             print("Processing videos from queue...")
@@ -70,7 +71,13 @@ def _ytdlp_main(workdir, proxy):
 
 
 class Server:
-    def __init__(self, workdir, proxy, video_size=-1, thumbnail_size=-1):
+    _workdir: str
+    _proxy: Optional[str]
+    _ttl: int
+    video_size: int
+    thumbnail_size: int
+
+    def __init__(self, workdir: str, proxy: Optional[str], video_size: int = -1, thumbnail_size: int = -1):
         self._workdir = workdir
         self._proxy = proxy
         tbdir = os.path.join(self._workdir, "thumbnails")
@@ -88,16 +95,16 @@ class Server:
         self._yt.start()
         self.ext_auth = False
 
-    def set_ttl(self, ttl):
+    def set_ttl(self, ttl: int):
         self._ttl = ttl
 
-    def _load_user(self, user):
+    def _load_user(self, user: str):
         return self._db.kv_get("users", user)
 
-    def _save_user(self, user, info):
+    def _save_user(self, user: str, info: Any):
         self._db.kv_set("users", user, info)
 
-    def check_user(self, user, password):
+    def check_user(self, user: str, password: str):
         if self.ext_auth:
             info = self._load_user(user)
             if info is None:
@@ -111,7 +118,7 @@ class Server:
             logging.warning(f"Auth problem: {exc}")
             return False
 
-    def list_user_feeds(self, user):
+    def list_user_feeds(self, user: str):
         u = self._load_user(user)
         res = {}
         for feed in u.get("feeds", []):
@@ -127,12 +134,12 @@ class Server:
                 log.error(f"can't parse feed: {exc}")
         return res
 
-    def subscribe(self, user, channel_id):
+    def subscribe(self, user: str, channel_id: str):
         info = self._load_user(user)
         info["feeds"].append(channel_id)
         self._save_user(user, info)
 
-    def unsubscribe(self, user, channel_id):
+    def unsubscribe(self, user: str, channel_id: str):
         info = self._load_user(user)
         subscriptions = []
         for item in info["feeds"]:
@@ -150,14 +157,14 @@ class Server:
         item.watch = key
         self._db.queue_put(item)
 
-    def remove_video(self, watch_id):
+    def remove_video(self, watch_id: str):
         " Remove video by sha256 name "
         _verify_watch_id(watch_id)
         nm = os.path.join(self._workdir, "video", watch_id + ".mp4")
         if os.path.exists(nm):
             os.unlink(nm)
 
-    def get_video(self, link):
+    def get_video(self, link: str):
         " get filename for the video "
         if link.find("youtu") >= 0:
             id = _url_to_name(link)
@@ -178,7 +185,7 @@ class Server:
 
         return dc_to_json(res)
 
-    def search(self, query):
+    def search(self, query: str):
         " Search video on YouTube by query "
         data = youtubedl.search(self._workdir, query, self._proxy)
         data.prepare_ids()
@@ -188,7 +195,7 @@ class Server:
                 item.watch = vid
         return dc_to_json(data)
 
-    def get_image(self, url):
+    def get_image(self, url: str):
         " Load image into cache and return filepath of the file "
         name = _url_to_name(url) + ".jpg"
         path = os.path.join(self._workdir, "thumbnails", name)
@@ -200,7 +207,7 @@ class Server:
             out.write(data)
         return path
 
-    def get_user_info(self, user):
+    def get_user_info(self, user: str):
         info = self._load_user(user)
         return {
             "name": user,
@@ -208,7 +215,7 @@ class Server:
             "feeds": info["feeds"],
         }
 
-    def has_video(self, name):
+    def has_video(self, name: str):
         " Check if video exists "
         return os.path.exists(os.path.join(self._workdir, "video", name + ".mp4"))
 
@@ -238,7 +245,7 @@ class Server:
         self._clean_dir(os.path.join(self._workdir, "video"), rubicon, self.video_size)
         self._clean_dir(os.path.join(self._workdir, "thumbnails"), rubicon, self.thumbnail_size)
 
-    def _clean_dir(self, path, rubicon, max_size = -1):
+    def _clean_dir(self, path: str, rubicon: float, max_size: int = -1):
         files = []
         for fnm in os.listdir(path):
             p = os.path.join(path, fnm)
@@ -253,8 +260,8 @@ class Server:
                 except Exception as exc:
                     log.warning(f"Can't remove file: {p} ({exc})")
         if max_size > 0:
-            files.sort(key=lambda x: x[1], reverse=True) # Old files last
-            size = 0
+            files.sort(key=lambda x: x[1], reverse=True)  # Old files last
+            size = 0.0
             rm_from = len(files)
             for i, (fnm, _, fsz) in enumerate(files):
                 size += fsz / 1048576
@@ -278,7 +285,7 @@ class Server:
         for f_id in all_feeds:
             self._update_feed(f_id)
 
-    def _update_feed(self, feed_id):
+    def _update_feed(self, feed_id: str):
         try:
             res = feed.Feed()
             old = self._db.kv_get("rss", feed_id)
@@ -292,18 +299,18 @@ class Server:
             for item in new.items:
                 news[item.link] = item
 
-            news = [n for _, n in news.items()]
-            news.sort(key=lambda n: -n.time)
-            if len(news) > 100:
-                news = news[:100]
-            res.items = news
+            newsItems = [n for _, n in news.items()]
+            newsItems.sort(key=lambda n: -n.time)
+            if len(newsItems) > 100:
+                newsItems = newsItems[:100]
+            res.items = newsItems
 
             self._db.kv_set("rss", feed_id, res)
 
         except Exception as exc:
             log.warning(f"Can not update feed {feed_id}: {exc}")
 
-    def _get_feed(self, feed_id):
+    def _get_feed(self, feed_id: str):
         res = self._db.kv_get("rss", feed_id)
         if res is not None:
             return res

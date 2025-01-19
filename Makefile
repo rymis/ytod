@@ -4,7 +4,7 @@ all:
 format:
 	python3 -m pycodestyle --ignore=E722 --max-line-length=200 ytod/*.py
 
-test: unittest integration_test
+test: unittest integration_test mypy
 	echo "All tests have passed"
 
 unittest:
@@ -12,5 +12,8 @@ unittest:
 
 integration_test:
 	./venv/bin/python3 ./integration_test/integration_test.py test
+
+mypy:
+	./venv/bin/mypy ytod
 
 .PHONY: format test integration_test unittest
