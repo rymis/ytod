@@ -17,9 +17,9 @@ What we need to do to make it better
 * [x] Download queue + retries (partially)
 * [x] Error messages for not-downloaded videos
 * [ ] Personal downloaded feed
-* [ ] Documentation for docker/deployment
+* [x] Documentation for docker/deployment
 * [ ] Better database: descriptions for downloaded videos
-* [ ] Quotas: remove old videos to download new ones even before TTL comes
+* [x] Quotas: remove old videos to download new ones even before TTL comes
 * [ ] Audio only: possibility to make podcasts from videos
 * [ ] Super low resolution videos for slow mobile networks
 * [x] Tests
