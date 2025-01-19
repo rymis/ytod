@@ -1,5 +1,5 @@
-import { Feed } from "./feed.jsx";
-import { SearchInput } from "./components/searchInput.jsx";
+import { Feed } from "../ui/feed.jsx";
+import { SearchInput } from "../components/searchInput.jsx";
 import m from "mithril";
 
 function doSearch() {

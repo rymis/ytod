@@ -1,5 +1,5 @@
 import { Notifications } from "./components/notifications";
-import { Header } from "./header";
+import { Header } from "./ui/header";
 
 export const Main = {
   view: function (vnode) {
