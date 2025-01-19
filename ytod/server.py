@@ -70,13 +70,15 @@ def _ytdlp_main(workdir, proxy):
 
 
 class Server:
-    def __init__(self, workdir, proxy):
+    def __init__(self, workdir, proxy, video_size=-1, thumbnail_size=-1):
         self._workdir = workdir
         self._proxy = proxy
         tbdir = os.path.join(self._workdir, "thumbnails")
         os.makedirs(tbdir, exist_ok=True)
         os.makedirs(os.path.join(self._workdir, "video"), exist_ok=True)
         self._ttl = 30
+        self.video_size = video_size
+        self.thumbnail_size = thumbnail_size
 
         self._db = self._open_db()
 
@@ -233,19 +235,39 @@ class Server:
         " Remove old videos and images "
         log.info("Cleaning up old videos/images")
         rubicon = time.time() - self._ttl * 86400
-        self._clean_dir(os.path.join(self._workdir, "video"), rubicon)
-        self._clean_dir(os.path.join(self._workdir, "thumbnails"), rubicon)
+        self._clean_dir(os.path.join(self._workdir, "video"), rubicon, self.video_size)
+        self._clean_dir(os.path.join(self._workdir, "thumbnails"), rubicon, self.thumbnail_size)
 
-    def _clean_dir(self, path, rubicon):
+    def _clean_dir(self, path, rubicon, max_size = -1):
+        files = []
         for fnm in os.listdir(path):
             p = os.path.join(path, fnm)
             if os.path.isfile(p):
                 try:
                     st = os.stat(p)
                     if st.st_ctime < rubicon:
+                        log.info(f"Removing file {p}")
                         os.unlink(p)
+                    else:
+                        files.append((p, st.st_ctime, st.st_size))
                 except Exception as exc:
                     log.warning(f"Can't remove file: {p} ({exc})")
+        if max_size > 0:
+            files.sort(key=lambda x: x[1], reverse=True) # Old files last
+            size = 0
+            rm_from = len(files)
+            for i, (fnm, _, fsz) in enumerate(files):
+                size += fsz / 1048576
+                if size >= max_size:
+                    rm_from = i
+                    break
+
+            for i in range(rm_from, len(files)):
+                try:
+                    log.info(f"Removing file {files[i][0]}")
+                    os.unlink(files[i][0])
+                except Exception as exc:
+                    log.warning(f"Can't remove file: {files[i][0]} ({exc})")
 
     def _feed_update(self):
         all_feeds = set()
