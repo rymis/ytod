@@ -14,6 +14,7 @@ import multiprocessing as mp
 import logging
 import subprocess as sp
 import json
+from typing import Optional
 from . import feed
 
 log = logging.getLogger("youtube")
@@ -23,7 +24,7 @@ TTL = 86400 * 3         # 3 days
 VIDEO_TTL = 86400 * 30  # 30 days
 
 
-def _update_ytdl(cache_dir):
+def _update_ytdl(cache_dir: str):
     mod = os.path.join(cache_dir, "yt_dlp.zip")
     need_update = True
     try:
@@ -44,7 +45,7 @@ def _update_ytdl(cache_dir):
         os.rename(mod + ".tmp", mod)
 
 
-def load_video(workdir, item: feed.Item, proxy=None):
+def load_video(workdir: str, item: feed.Item, proxy=None):
     output = os.path.join(workdir, "video", item.watch + ".mp4")
     tmp = os.path.join(workdir, "tmp", item.watch + ".mp4")
     os.makedirs(os.path.join(workdir, "video"), exist_ok=True)
@@ -87,7 +88,7 @@ def load_video(workdir, item: feed.Item, proxy=None):
     return "Error: " + "\n".join(err)
 
 
-def search(workdir, query, proxy):
+def search(workdir: str, query: str, proxy: Optional[str]):
     " Search video on youtube "
     _update_ytdl(workdir)
 
@@ -99,7 +100,7 @@ def search(workdir, query, proxy):
                 "--no-playlist", "--no-check-certificate",
                 "--geo-bypass", "--flat-playlist",
                 "--skip-download", "--quiet",
-                "--ignore-errors", f"ytsearch10:{query}"])
+                "--ignore-errors", f"ytsearch20:{query}"])
     p = sp.Popen(cmd, stdout=sp.PIPE)
     out = p.communicate()[0].decode('utf-8').split("\n")
     data = []

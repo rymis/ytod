@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from bottle import route, run, static_file, redirect, request, HTTPError
+from bottle import route, run, static_file, redirect, request, HTTPError  # type: ignore
 import argparse
 import os
 from . import server
@@ -54,7 +54,7 @@ def index():
 
 @route('/ytod/')
 @auth_basic(is_authenticated_user)
-def index():
+def index2():
     redirect("/ytod/static/index.html")
 
 
@@ -66,7 +66,7 @@ def feeds():
 
 @route('/ytod/api/search')
 @auth_basic(is_authenticated_user)
-def feeds():
+def search():
     query = request.query.q
     return APP.search(query)
 
@@ -94,7 +94,7 @@ def video(id):
 
 @route('/ytod/api/remove')
 @auth_basic(is_authenticated_user)
-def video():
+def remove():
     vid = request.query.video_id
     APP.remove_video(vid)
     return {"result": "ok"}

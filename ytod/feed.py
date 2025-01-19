@@ -3,9 +3,9 @@
 import urllib
 import json
 import logging
-import feedparser
+import feedparser  # type: ignore
 import time
-import dateutil.parser
+import dateutil.parser  # type: ignore
 from dataclasses import dataclass
 import dataclasses
 import typing
@@ -19,11 +19,7 @@ log = logging.getLogger("rss")
 RSS client here:
 https://www.youtube.com/feeds/videos.xml?channel_id=THE_CHANNEL_ID_HERE
 """
-YOUTUBE_URL = "https://www.youtube.com/feeds/videos.xml?channel_id="
-
-
-if os.getenv("YTOD_OVERRIDE_YOUTUBE_URL"):
-    YOUTUBE_URL = os.getenv("YTOD_OVERRIDE_YOUTUBE_URL")
+YOUTUBE_URL = os.getenv("YTOD_OVERRIDE_YOUTUBE_URL", "https://www.youtube.com/feeds/videos.xml?channel_id=")
 
 
 @dataclass
@@ -130,8 +126,8 @@ def load_feed(feed_id: str) -> Feed:
 
         news[n.link] = item
 
-    news = [n for _, n in news.items()]
-    news.sort(key=lambda n: -n.time)
-    data.items = news
+    newsItems = [n for _, n in news.items()]
+    newsItems.sort(key=lambda n: -n.time)
+    data.items = newsItems
 
     return data
